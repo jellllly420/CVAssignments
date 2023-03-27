@@ -99,13 +99,13 @@ def convolve(img, kernel):
     x = np.repeat(np.arange(nrow_o), ncol_o)
     x_k = np.repeat(np.arange(nrow_k), ncol_k)
     x = x[:, np.newaxis] + x_k
-    y = np.tile(np.arange(nrow_o), ncol_o)
-    y_k = np.tile(np.arange(nrow_k), ncol_k)
+    y = np.tile(np.arange(ncol_o), nrow_o)
+    y_k = np.tile(np.arange(ncol_k), nrow_k)
     y = y[:, np.newaxis] + y_k
     
     #convolve
     matrix = img[x,y]
-    flattened_kernel = kernel.flatten()
+    flattened_kernel = kernel.flatten()[:, np.newaxis]
     output = (matrix @ flattened_kernel).reshape((nrow_o, ncol_o))
 
     return output

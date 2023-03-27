@@ -85,7 +85,6 @@ def hysteresis_thresholding(img) :
     high_ratio = 1.0
 
     #compute threshold
-    print(np.mean(img))
     mean = np.sum(img) / np.sum(img != 0)
     low_threshold = low_ratio * mean
     high_threshold = high_ratio * mean
@@ -102,7 +101,7 @@ def hysteresis_thresholding(img) :
     """
     Switched to the strategy stated in 
     https://towardsdatascience.com/canny-edge-detection-step-by-step-in-python-computer-vision-b49c3a2d8123
-    from that in slides because of the lack of direction parameter.
+    from that in slides due to the lack of direction parameter.
     """
     #grow edges
     updated = True
