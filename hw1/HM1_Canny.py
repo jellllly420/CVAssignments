@@ -136,7 +136,7 @@ def hysteresis_thresholding(img) :
 if __name__=="__main__":
 
     #Load the input images
-    input_img = read_img("lenna.png")/255
+    input_img = read_img("Lenna.png")/255
 
     #Apply gaussian blurring
     blur_img = Gaussian_filter(input_img)

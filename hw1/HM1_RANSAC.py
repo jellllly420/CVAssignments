@@ -25,17 +25,12 @@ if __name__ == "__main__":
     #evaluate inliers (with point-to-plance distance < distance_threshold)
     distance = (planes @ data_points.T) ** 2
     inliners = np.where(distance < distance_threshold, 1, 0)
-    #print(inliners)
     best_idx = np.argmax(np.sum(inliners, axis = 1), axis = 0)
-    #print(best_idx)
 
     # minimize the sum of squared perpendicular distances of all inliers with least-squared method 
     inliner_points = data_points[np.where(inliners[best_idx] == 1)]
-    #print(inliner_points)
     _, _, vh = np.linalg.svd(inliner_points)
-    print(vh)
     pf = vh[-1, :]
-    print(pf)
 
 
     # draw the estimated plane with points and save the results 
