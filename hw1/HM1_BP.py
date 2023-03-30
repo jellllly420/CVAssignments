@@ -29,8 +29,13 @@ if __name__ == "__main__":
         print("iteration: %d, loss: %f" % (i+1 ,loss))
         loss_list.append(loss)
 
-
         # Backward : compute the gradient of paratmerters of layer1 (grad_layer_1) and layer2 (grad_layer_2)
+        d_loss__d_output_layer_2 = pred_y - gt_y #(10, 1)
+        grad_layer_2 = output_layer_1_act.T @ d_loss__d_output_layer_2 #(16, 1)
+
+        d_loss__d_output_layer_1_act = d_loss__d_output_layer_2 @ MLP_layer_2.T #(10, 16)
+        d_loss__d_output_layer_1 = d_loss__d_output_layer_1_act * output_layer_1_act * (1 - output_layer_1_act) #（10, 16）
+        grad_layer_1 = input_vector.T @ d_loss__d_output_layer_1 #(784, 16)
 
         MLP_layer_1 -= lr * grad_layer_1
         MLP_layer_2 -= lr * grad_layer_2
