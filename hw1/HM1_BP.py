@@ -16,7 +16,7 @@ if __name__ == "__main__":
     #Intialization MLP  (784 -> 16 -> 1)
     MLP_layer_1 = np.random.randn(784,16)
     MLP_layer_2 = np.random.randn(16,1)
-    lr=1e-2
+    lr=1e-1
     loss_list=[]
 
     for i in range(50):
