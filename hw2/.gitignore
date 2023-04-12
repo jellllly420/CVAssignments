@@ -1,0 +1,4 @@
+datasets/
+experiments/
+cifar-10/__pycache__/
+.DS*
