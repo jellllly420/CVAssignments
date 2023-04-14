@@ -5,8 +5,8 @@ import pickle
 import torch 
 
 # # use below packages as you like 
-# import torchvision.transforms as tfs
-# from PIL import Image
+import torchvision.transforms as tfs
+from PIL import Image
 # import cv2
 
 class CIFAR10(torch.utils.data.Dataset):
@@ -65,18 +65,28 @@ class CIFAR10(torch.utils.data.Dataset):
         Returns:
             tuple: (image, target) where target is index of the target class.
         """
+        if self.train:
+            index = index // 3
         img, target = self.data[index], self.targets[index]
-        img = img.astype(np.float32)
-        img = img.transpose(2, 0, 1)
         
         # ------------TODO--------------
         # data augmentation
+        if self.train and index % 3:
+            img = Image.fromarray(img)
+            if index % 3 == 1:
+                img = tfs.RandomHorizontalFlip(1)(img)
+            elif index % 3 == 2:
+                img = tfs.ColorJitter(brightness = 0.5, hue = 0.3)(img)
         # ------------TODO--------------
+
+        img = np.asarray(img)
+        img = img.astype(np.float32)
+        img = img.transpose(2, 0, 1)
 
         return img, target
 
     def __len__(self):
-        return len(self.data)
+        return (len(self.data) * 3) if self.train else len(self.data)
 
 if __name__ == '__main__':
     from PIL import Image
@@ -102,13 +112,13 @@ if __name__ == '__main__':
 
     # --------------TODO------------------
     # Copy the first kind of your augmentation code here
+    aug1 = tfs.RandomHorizontalFlip(1)(img)
     # --------------TODO------------------
-    aug1 = img
     aug1.save(f'../results/Lenna_aug1.png')
 
     # --------------TODO------------------
     # Copy the second kind of your augmentation code here
+    aug2 = tfs.ColorJitter(brightness = 0.5, hue = 0.3)(img)
     # --------------TODO------------------
-    aug2 = img
     aug2.save(f'../results/Lenna_aug2.png')
 

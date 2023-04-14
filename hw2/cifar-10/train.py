@@ -11,6 +11,14 @@ from torch.utils.tensorboard  import SummaryWriter
 def MyCELoss(pred, gt):
     # ----------TODO------------
     # Implement CE loss here
+    _, n_classes = pred.shape
+    pred_negative = pred - torch.max(pred, dim = 1).values[:, None]
+    log_pred_above = pred_negative
+    log_pred_below = torch.log(torch.sum(torch.exp(pred_negative), dim = 1))[:, None]
+    log_pred = log_pred_above - log_pred_below
+    gt_one_hot = torch.nn.functional.one_hot(gt, num_classes = n_classes)
+    ce = 0 - torch.sum(log_pred * gt_one_hot, dim = 1)
+    loss = torch.mean(ce)
     # ----------TODO------------
     return loss 
 
@@ -32,6 +40,8 @@ def validate(epoch, model, val_loader, writer):
 
     # ----------TODO------------
     # draw accuracy curve!
+    writer.add_scalar('val/top1', top1.avg, epoch)
+    writer.add_scalar('val/top5', top5.avg, epoch)
     # ----------TODO------------
 
     print(' Val Acc@1 {top1.avg:.3f}'.format(top1=top1))
@@ -68,9 +78,11 @@ def train(epoch, model, optimizer, train_loader, writer):
 
         iteration += 1
         if iteration % 50 == 0:
-            pass 
             # ----------TODO------------
             # draw loss curve and accuracy curve!
+            writer.add_scalar('train/loss', loss, iteration)
+            writer.add_scalar('train/top1', top1.avg, iteration)
+            writer.add_scalar('train/top5', top5.avg, iteration)
             # ----------TODO------------
 
     print(' Epoch: %d'%(epoch))
