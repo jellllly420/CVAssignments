@@ -66,8 +66,10 @@ class CIFAR10(torch.utils.data.Dataset):
             tuple: (image, target) where target is index of the target class.
         """
         if self.train:
-            index = index // 3
-        img, target = self.data[index], self.targets[index]
+            index_ = index // 3
+        else:
+            index_ = index
+        img, target = self.data[index_], self.targets[index_]
         
         # ------------TODO--------------
         # data augmentation
