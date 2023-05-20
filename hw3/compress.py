@@ -18,12 +18,12 @@ if __name__ == "__main__":
     
     # ---------------------------------------------------------
     # 请用你的学号和姓名替换下面的内容，注意参照例子的格式，使用拼音而非中文
-    id = 1000010000
-    name = 'ZhangSan'
+    id = 2000012974
+    name = 'ZhaoZejun'
     # ---------------------------------------------------------
 
     zip_name = f'{id}_{name}.zip'
-    current_file_directory_path = os.path.dirname(__file__)
+    current_file_directory_path = os.path.dirname(os.path.realpath(__file__))
     input_path = current_file_directory_path
     output_path = os.path.join(current_file_directory_path, zip_name)
  
