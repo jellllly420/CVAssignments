@@ -102,24 +102,85 @@ class SingleShapeDataset(torch.utils.data.Dataset):
 
 class ShapeDataset(torch.utils.data.Dataset):
     def __init__(self, size):
-
         self.w = 128
         self.h = 128
         self.size = size
         print("size",self.size)
 
+    def _draw_shape(self, img, masks, obj_ids, threshold = 0.2):
+        n_shapes = len(obj_ids)
+        
+        buffer = 20
+        for i in range(n_shapes):
+            while True:
+                y = random.randint(buffer, self.h - buffer - 1)
+                x = random.randint(buffer, self.w - buffer - 1)
+                s = random.randint(buffer, self.h//4)
 
-
-
+                if obj_ids[i] == 1:
+                    cv2.rectangle(masks[i], (x-s, y-s), (x+s, y+s), 1, -1)
+                elif obj_ids[i] == 2:
+                    cv2.circle(masks[i], (x, y), s, 1, -1)
+                elif obj_ids[i] == 3:
+                    points = np.array([[(x, y-s),
+                                    (x-s/math.sin(math.radians(60)), y+s),
+                                    (x+s/math.sin(math.radians(60)), y+s),
+                                    ]], dtype=np.int32)
+                    cv2.fillPoly(masks[i], points, 1)
+                
+                for j in range(i):
+                    iou = np.logical_and(masks[j], masks[i]).sum() / \
+                        np.logical_or(masks[j], masks[i]).sum()
+                    if iou > threshold:
+                        break
+                else:        
+                    color = tuple([random.randint(0, 255) for _ in range(3)])
+                    if obj_ids[i] == 1:
+                        cv2.rectangle(img, (x-s, y-s), (x+s, y+s), color, -1)
+                    elif obj_ids[i] == 2:
+                        cv2.circle(img, (x, y), s, color, -1)
+                    elif obj_ids[i] == 3:
+                        points = np.array([[(x, y-s),
+                                        (x-s/math.sin(math.radians(60)), y+s),
+                                        (x+s/math.sin(math.radians(60)), y+s),
+                                        ]], dtype=np.int32)
+                        cv2.fillPoly(img, points, color)
+                    break
+                masks[i] = 0
+        
+        for i in range(n_shapes):
+            for j in range(i + 1, n_shapes):
+                masks[i][np.where(masks[j])] = 0
 
     def __getitem__(self, idx):
         np.random.seed(idx)
         n_shapes = random.randint(1,3)
 
+        masks = np.zeros((n_shapes, self.h, self.w))
+        img = np.zeros((self.h, self.w, 3))
+        img[...,:] = np.asarray([random.randint(0, 255) for _ in range(3)])[None, None, :]
+
+        obj_ids = [random.randint(1, 3) for i in range(n_shapes)]
+        self._draw_shape(img, masks, obj_ids)
+        obj_ids = np.flip(obj_ids, axis = 0).copy()
+        masks = np.flip(masks, axis = 0).copy()
+
+        boxes = np.zeros((n_shapes, 4))
+        for i in range(n_shapes):
+            pos = np.where(masks[i])
+            xmin = np.min(pos[1])
+            xmax = np.max(pos[1])
+            ymin = np.min(pos[0])
+            ymax = np.max(pos[0])
+            boxes[i, :] = np.asarray([xmin, ymin, xmax, ymax])
+
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        labels = torch.as_tensor(obj_ids, dtype=torch.int64)
+        masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
         # iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
-
+        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
         target = {}
         target["boxes"] = boxes
