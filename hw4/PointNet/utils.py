@@ -2,7 +2,7 @@ import os
 from torch.utils.tensorboard  import SummaryWriter
 
 class setting:
-    dataset = "/home/jelly/intro2cv/hw4/PointNet/shapenetcore_partanno_segmentation_benchmark_v0"
+    dataset = "xxx/PointNet/shapenetcore_partanno_segmentation_benchmark_v0"
     batchSize = 32
     num_points = 1024
     workers = 1

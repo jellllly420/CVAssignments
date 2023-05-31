@@ -2,3 +2,4 @@
 *.pth
 *.pyc
 .DS_Store
+tmp/

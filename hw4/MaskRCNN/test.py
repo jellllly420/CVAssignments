@@ -25,23 +25,23 @@ def compute_detection_ap(output_list, gt_labels_list, iou_threshold=0.5):
         return float(intersection) / union
 
     predictions_ = []
-    for i in range(10):
+    for i in range(len(gt_labels_list)):
         for box, label, score in zip(output_list[i]['boxes'], output_list[i]['labels'], output_list[i]['scores']):
             predictions_.append(torch.concatenate([torch.Tensor([i]), torch.Tensor([score]), torch.Tensor([label]), box]))
     predictions_ = torch.stack(predictions_)
-    predictions_ = predictions_[predictions_[:, 1].argsort()]
+    predictions_ = predictions_[predictions_[:, 1].argsort(descending = True)]
 
     aps = []
     for i in range(1, 4):
         num_gt = 0
-        for j in range(10):
+        for j in range(len(gt_labels_list)):
             if gt_labels_list[j]['labels'][0] == i:
                 num_gt += 1
         if num_gt == 0:
             continue
         
         predictions = predictions_[predictions_[:, 2] == i]
-        flags = [False for _ in range(10)]
+        flags = [False for _ in range(len(gt_labels_list))]
         tp = 0
         precisions = []
         recalls = []
@@ -87,23 +87,23 @@ def compute_segmentation_ap(output_list, gt_labels_list, iou_threshold=0.5):
         return float(intersection) / union
 
     predictions_ = []
-    for i in range(10):
+    for i in range(len(gt_labels_list)):
         for mask, label, score in zip(output_list[i]['masks'], output_list[i]['labels'], output_list[i]['scores']):
             predictions_.append(torch.concatenate([torch.Tensor([i]), torch.Tensor([score]), torch.Tensor([label]), torch.flatten(mask)]))
     predictions_ = torch.stack(predictions_)
-    predictions_ = predictions_[predictions_[:, 1].argsort()]
+    predictions_ = predictions_[predictions_[:, 1].argsort(descending = True)]
 
     aps = []
     for i in range(1, 4):
         num_gt = 0
-        for j in range(10):
+        for j in range(len(gt_labels_list)):
             if gt_labels_list[j]['labels'][0] == i:
                 num_gt += 1
         if num_gt == 0:
             continue
         
         predictions = predictions_[predictions_[:, 2] == i]
-        flags = [False for _ in range(10)]
+        flags = [False for _ in range(len(gt_labels_list))]
         tp = 0
         precisions = []
         recalls = []
@@ -144,7 +144,7 @@ def compute_segmentation_ap(output_list, gt_labels_list, iou_threshold=0.5):
 
 
 
-dataset_test = SingleShapeDataset(10)
+dataset_test = SingleShapeDataset(100)
 
 data_loader_test = torch.utils.data.DataLoader(
     dataset_test, batch_size=1, shuffle=False, num_workers=0,
@@ -160,7 +160,7 @@ device = torch.device('cpu')
 
 
 # replace the 'cpu' to 'cuda' if you have a gpu
-model.load_state_dict(torch.load(r'/home/jelly/intro2cv/hw4/MaskRCNN/results/maskrcnn_2.pth',map_location='cpu'))
+model.load_state_dict(torch.load(r'xxx/MaskRCNN/results/maskrcnn_23.pth',map_location='cpu'))
 
 
 
@@ -177,7 +177,7 @@ for i in range(10):
 gt_labels_list = []
 output_label_list = []
 with torch.no_grad():
-    for i in range(10):
+    for i in range(100):
         print(i)
         imgs, labels = dataset_test[i]
         gt_labels_list.append(labels)

@@ -9,7 +9,7 @@ num_classes = 4 # 0 for backgroud
  
 model = utils.get_instance_segmentation_model(num_classes).double()
 
-model.load_state_dict(torch.load(r'/home/jelly/intro2cv/hw4/MaskRCNN/intro2cv_maskrcnn_pretrained.pth',map_location='cpu'))
+model.load_state_dict(torch.load(r'xxx/MaskRCNN/intro2cv_maskrcnn_pretrained.pth',map_location='cpu'))
 
 dataset = ShapeDataset(10)
 
@@ -24,14 +24,14 @@ optimizer = torch.optim.SGD(params, lr=0.001,
                             momentum=0.9, weight_decay=0.0005)
 
 lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
-                                               step_size=3,
+                                               step_size=50,
                                                gamma=0.1)
 
-num_epochs = 3
+num_epochs = 24
 device = torch.device('cpu')
 
 
 for epoch in range(num_epochs):
-    train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=1)
+    train_one_epoch(model, optimizer, lr_scheduler, data_loader, device, epoch, print_freq=1)
     torch.save(model.state_dict(), "results/maskrcnn_"+str(epoch)+".pth") 
     
